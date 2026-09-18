@@ -1,4 +1,4 @@
-﻿# RoadSense-MTL documentation index
+# RoadSense-MTL documentation index
 
 ## Project status
 
@@ -19,6 +19,8 @@ and YAML this is written as `[384, 640]` (`height × width`).
   optimization, experiment design, roadmap and final deliverables.
 - [AI progress tracker](AI_PROGRESS.md): implementation state, evidence,
   decisions, known risks and exact next actions.
+- [Kaggle training](KAGGLE.md): automatic discovery, preflight, pilot/full runs,
+  resume behavior, artifacts and failure guardrails.
 - [Milestone 1](milestone_1.md): implemented data contract, indexing,
   rasterization, auditing, splitting, metrics and visualization.
 - [Milestone 2](milestone_2.md): implemented detection/drivable/lane baselines,

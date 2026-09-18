@@ -1,4 +1,4 @@
-﻿# RoadSense-MTL — AI progress tracker
+# RoadSense-MTL — AI progress tracker
 
 > File handoff dành cho AI/cộng tác viên. Đọc file này và
 > [`PLAN.md`](PLAN.md) trước khi sửa code.
@@ -9,7 +9,7 @@
 |---|---|
 | Cập nhật lần cuối | 2026-09-18 |
 | Milestone hiện tại | M2 — independent single-task baselines |
-| Phạm vi được phép hiện tại | Duy trì/kiểm chứng M1–M2 và chuẩn bị tài liệu |
+| Phạm vi được phép hiện tại | Chuẩn bị và kiểm chứng pipeline Kaggle cho M2 |
 | Milestone 3 | Chưa bắt đầu; không triển khai nếu chưa có yêu cầu mới |
 | Input chuẩn | `[384, 640]` trong YAML/tensor (`640×384` width×height) |
 | Dataset chính | BDD100K |
@@ -37,6 +37,7 @@ Không dùng từ “hoàn thành” nếu chỉ mới tạo file hoặc smoke t
 | M2.2 | Drivable STL baseline | IMPLEMENTED | ResNet18-FPN + CE/Dice | Chạy/ghi metric full experiment |
 | M2.3 | Lane STL baseline | IMPLEMENTED | ResNet18-FPN + BCE/Dice | Chạy/ghi metric full experiment |
 | M2.4 | Checkpoint/resume/evaluation | IMPLEMENTED | `training/engine.py`, Milestone 2 tests | Thêm integration evidence trên GPU run |
+| M2.5 | Kaggle automation | IMPLEMENTED | `roadsense.kaggle`, `tests/test_kaggle.py`, `docs/KAGGLE.md` | Chạy pilot trên Kaggle GPU và lưu evidence |
 | M3A | Shared MTL baseline | NOT_STARTED | Thiết kế trong project plan | Chờ yêu cầu bắt đầu M3 |
 | M3B | Gated adapters | NOT_STARTED | Thiết kế trong project plan | Phụ thuộc M3A |
 | M3C | Gradient diagnostics + PCGrad | NOT_STARTED | Thiết kế trong project plan | Phụ thuộc M3A/M3B |
@@ -56,6 +57,8 @@ Không dùng từ “hoàn thành” nếu chỉ mới tạo file hoặc smoke t
 - `src/roadsense/training`: config, aligned transforms, DataLoader, train,
   evaluate, checkpoint, resume và smoke tests.
 - `configs/experiments`: 3 full baseline configs và 3 CPU smoke configs.
+- `src/roadsense/kaggle.py`: auto-discovery, resolved configs, preflight, resume,
+  evaluation và provenance cho Kaggle.
 
 ### Cố ý chưa có
 
@@ -117,6 +120,8 @@ Smoke score không được ghi vào bảng kết quả nghiên cứu.
 | Ngày | Phạm vi | Command/evidence | Kết quả |
 |---|---|---|---|
 | 2026-09-18 | Documentation consolidation | `docs/PLAN.md`, `docs/AI_PROGRESS.md` | Kế hoạch và tracker được tách rõ; M3 vẫn chưa triển khai |
+| 2026-09-18 | Kaggle automation | `python -m pytest` | Auto-discovery/config guardrails được triển khai; 19 tests pass |
+| 2026-09-18 | Kaggle integration | `python -m roadsense.kaggle ... --train-limit 1 --val-limit 1` | Real-data train/checkpoint/evaluate hoàn tất; manifest `succeeded` và đủ 9 artifact |
 
 Thêm dòng mới; không sửa lịch sử cũ trừ khi đính chính sai sót và nêu lý do.
 
@@ -133,12 +138,11 @@ Thêm dòng mới; không sửa lịch sử cũ trừ khi đính chính sai sót
 
 ## Next authorized actions
 
-Hiện không có task code mới được ủy quyền. Khi có yêu cầu tiếp theo, ưu tiên:
-
-1. Chạy lại toàn bộ test M1–M2.
-2. Kiểm kê artifact của ba full STL baselines và ghi evidence thực tế.
-3. Chỉ sau khi M2 được nghiệm thu và người dùng cho phép: lập implementation
-   checklist cho M3A, chưa gộp adapters/PCGrad vào bước đầu.
+1. Push/merge branch `feat/kaggle-m2` sau khi review.
+2. Chạy `--task all --mode pilot` trên Kaggle GPU.
+3. Lưu ba `run_manifest.json` và chỉ bắt đầu full run khi cả ba pilot succeeded.
+4. Sau full run, commit experiment records nhỏ; không commit checkpoint.
+5. M3 vẫn chưa được kích hoạt.
 
 ## Handoff template
 

@@ -8,6 +8,7 @@ Tài liệu:
 - [Documentation index](docs/README.md).
 - [Kế hoạch dự án](docs/PLAN.md).
 - [Theo dõi tiến độ cho AI](docs/AI_PROGRESS.md).
+- [Huấn luyện tự động trên Kaggle](docs/KAGGLE.md).
 
 RoadSense-MTL studies negative transfer in joint object detection, drivable-area
 segmentation, and lane detection. The repository currently implements the data

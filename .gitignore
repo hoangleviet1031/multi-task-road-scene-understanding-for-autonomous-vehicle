@@ -18,3 +18,5 @@ outputs/
 .vscode/
 .DS_Store
 Thumbs.db
+cache/
+torch_cache/
