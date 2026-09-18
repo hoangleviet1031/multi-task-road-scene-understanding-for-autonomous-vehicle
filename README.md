@@ -6,19 +6,18 @@ Drivable-Area Segmentation and Lane Detection.
 Tài liệu:
 
 - [Documentation index](docs/README.md).
-- [Tổng quan chi tiết](docs/project_overview_vi.md).
-- [Thiết kế nghiên cứu conflict-aware](docs/conflict_aware_research_design_vi.md).
+- [Kế hoạch dự án](docs/PLAN.md).
+- [Theo dõi tiến độ cho AI](docs/AI_PROGRESS.md).
 
 RoadSense-MTL studies negative transfer in joint object detection, drivable-area
 segmentation, and lane detection. The repository currently implements the data
 foundation (Milestone 1) and reproducible independent baselines (Milestone 2).
-The multi-task model planned for Milestone 3 is intentionally not implemented
-until Milestone 2 is accepted.
+Milestone 3 is planned but intentionally not implemented yet.
 
-Current status: Milestones 1–2 are implemented and tested. The task-specific
-adapter and gradient-conflict design for Milestone 3 is documented but has not
-been implemented. All current model profiles use a 640×384 letterbox canvas
-(`width × height`; YAML uses `[384, 640]`).
+Current status: Milestones 1–2 are implemented and tested. All current model
+profiles use a 640×384 letterbox canvas (`width × height`; YAML uses
+`[384, 640]`). The project plan is the source of truth for future architecture;
+the progress tracker records implementation evidence and next actions.
 
 ## Implemented scope
 
@@ -92,8 +91,8 @@ roadsense visualize --config configs/data/bdd100k.yaml --split train `
   --index 0 --output outputs/samples/train_000000.jpg
 ```
 
-See `docs/milestone_1.md` for the design, expected inputs/outputs, validation
-rules, and troubleshooting guide.
+See `docs/milestone_1.md` for the implemented data design, input/output
+contracts, validation rules, and troubleshooting guide.
 
 ## Train and evaluate Milestone 2
 
@@ -112,5 +111,5 @@ roadsense-train evaluate --config configs/experiments/cpu_smoke_drivable.yaml `
 ```
 
 Full experiment profiles live in `configs/experiments`. See
-`docs/milestone_2.md` for architecture decisions, every public function's
-input/output contract, commands, and metric definitions.
+`docs/milestone_2.md` for architecture decisions, public function contracts,
+commands, and metric definitions.

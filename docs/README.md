@@ -1,24 +1,24 @@
-# RoadSense-MTL documentation index
+﻿# RoadSense-MTL documentation index
 
 ## Project status
 
 | Area | Status | Source of truth |
 |---|---|---|
+| Overall scope, target architecture and roadmap | Planned | `PLAN.md` |
+| Implementation status and AI handoff | Active tracker | `AI_PROGRESS.md` |
 | Data foundation | Implemented | `milestone_1.md` |
 | Independent single-task baselines | Implemented | `milestone_2.md` |
-| Conflict-aware multi-task research design | Designed, not implemented | `conflict_aware_research_design_vi.md` |
-| Overall project scope and roadmap | Current overview | `project_overview_vi.md` |
+| Shared conflict-aware multi-task model | Not started | Plan §4–9 and tracker M3 |
 
 Current model input is a `640×384` letterbox canvas (`width × height`). In code
 and YAML this is written as `[384, 640]` (`height × width`).
 
 ## Documents
 
-- [Project overview](project_overview_vi.md): problem, dataset, current
-  architecture, evaluation protocol, repository structure and roadmap.
-- [Conflict-aware research design](conflict_aware_research_design_vi.md): the
-  normative design for Milestone 3+, including task-specific adapters, PCGrad,
-  condition slices, OOD evaluation and ablations.
+- [Project plan](PLAN.md): authoritative scope, target architecture,
+  optimization, experiment design, roadmap and final deliverables.
+- [AI progress tracker](AI_PROGRESS.md): implementation state, evidence,
+  decisions, known risks and exact next actions.
 - [Milestone 1](milestone_1.md): implemented data contract, indexing,
   rasterization, auditing, splitting, metrics and visualization.
 - [Milestone 2](milestone_2.md): implemented detection/drivable/lane baselines,
@@ -26,14 +26,15 @@ and YAML this is written as `[384, 640]` (`height × width`).
 
 ## Consistency rules
 
-1. An implementation document describes only code that exists in the repository.
-2. Planned components must be explicitly marked `planned` or `not implemented`.
-3. `conflict_aware_research_design_vi.md` owns the Milestone 3 research design.
-4. `project_overview_vi.md` summarizes that design instead of redefining it.
-5. Input size is always described with its coordinate order.
-6. Operational Milestone 2 baselines and future capacity-matched research
-   controls must not be treated as the same experiment.
-7. Smoke metrics verify plumbing only and must not be reported as model quality.
+1. `PLAN.md` owns project scope and future design.
+2. `AI_PROGRESS.md` owns current status, evidence and handoff state.
+3. Milestone documents describe only code already implemented for that milestone.
+4. Planned components must be explicitly marked `NOT_STARTED` or not implemented.
+5. Input size is always documented with coordinate order.
+6. Operational Milestone 2 baselines are not capacity-matched MTL controls.
+7. Smoke metrics verify plumbing only and are not model-quality results.
+8. A milestone is complete only when implementation, tests, reproducible command
+   and required evidence are all available.
 
-When implementation status changes, update this index, the project overview,
-the relevant milestone document and the root README in the same commit.
+When implementation status changes, update `AI_PROGRESS.md` in the same change.
+Update the project plan only when scope or an architectural decision changes.
