@@ -1,0 +1,35 @@
+task: detection
+seed: 7
+device: cpu
+output_dir: outputs/experiments/cpu_smoke_detection
+
+data:
+  dataset_config: configs/data/bdd100k.yaml
+  source_split: train
+  manifest: data/splits/bdd100k_train_dev.json
+  train_key: train
+  val_key: dev
+  image_size: [128, 224]
+  batch_size: 1
+  num_workers: 0
+  horizontal_flip_probability: 0.0
+  max_train_samples: 1
+  max_val_samples: 1
+
+model:
+  name: fasterrcnn_mobilenet_v3_large_320_fpn
+  pretrained_backbone: false
+  trainable_backbone_layers: 6
+
+optimization:
+  epochs: 1
+  optimizer: sgd
+  learning_rate: 0.001
+  momentum: 0.9
+  weight_decay: 0.0005
+  gradient_clip_norm: 10.0
+  amp: false
+
+evaluation:
+  iou_thresholds: [0.50, 0.75]
+  score_threshold: 0.05

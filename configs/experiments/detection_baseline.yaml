@@ -1,0 +1,35 @@
+task: detection
+seed: 42
+device: auto
+output_dir: outputs/experiments/detection_baseline
+
+data:
+  dataset_config: configs/data/bdd100k.yaml
+  source_split: train
+  manifest: data/splits/bdd100k_train_dev.json
+  train_key: train
+  val_key: dev
+  image_size: [384, 640]
+  batch_size: 2
+  num_workers: 0
+  horizontal_flip_probability: 0.5
+  max_train_samples: null
+  max_val_samples: null
+
+model:
+  name: fasterrcnn_mobilenet_v3_large_320_fpn
+  pretrained_backbone: true
+  trainable_backbone_layers: 3
+
+optimization:
+  epochs: 20
+  optimizer: sgd
+  learning_rate: 0.005
+  momentum: 0.9
+  weight_decay: 0.0005
+  gradient_clip_norm: 10.0
+  amp: false
+
+evaluation:
+  iou_thresholds: [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+  score_threshold: 0.05

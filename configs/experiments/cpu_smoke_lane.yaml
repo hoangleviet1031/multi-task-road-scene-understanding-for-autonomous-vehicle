@@ -1,0 +1,39 @@
+task: lane
+seed: 7
+device: cpu
+output_dir: outputs/experiments/cpu_smoke_lane
+
+data:
+  dataset_config: configs/data/bdd100k.yaml
+  source_split: train
+  manifest: data/splits/bdd100k_train_dev.json
+  train_key: train
+  val_key: dev
+  image_size: [128, 224]
+  batch_size: 1
+  num_workers: 0
+  horizontal_flip_probability: 0.0
+  max_train_samples: 2
+  max_val_samples: 2
+
+model:
+  name: resnet18_fpn_segmenter
+  pretrained_backbone: false
+  fpn_channels: 32
+
+optimization:
+  epochs: 1
+  optimizer: adamw
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  gradient_clip_norm: 5.0
+  amp: false
+
+loss:
+  positive_weight: 10.0
+  binary_cross_entropy_weight: 1.0
+  dice_weight: 1.0
+
+evaluation:
+  threshold: 0.5
+  tolerance: 2

@@ -1,0 +1,33 @@
+# All relative paths are resolved from `root`.
+# Adjust only these paths when your BDD100K release has a different layout.
+root: data/raw
+cache_dir: data/interim/bdd100k
+
+splits:
+  train:
+    images: bdd100k/bdd100k/images/100k/train
+    detection_labels: bdd100k_labels_release/bdd100k/labels/bdd100k_labels_images_train.json
+    drivable_masks: null
+    lane_masks: null
+  val:
+    images: bdd100k/bdd100k/images/100k/val
+    detection_labels: bdd100k_labels_release/bdd100k/labels/bdd100k_labels_images_val.json
+    drivable_masks: null
+    lane_masks: null
+
+# These three tasks must be present for the main multi-task experiments.
+required_tasks:
+  - detection
+  - drivable
+  - lane
+
+# Official BDD100K mask encoding.
+drivable:
+  direct_id: 0
+  alternative_id: 1
+  background_id: 2
+
+lane:
+  # Official masks encode the background flag in bit 3. Values without this
+  # flag are lane foreground. 255 is therefore decoded as background.
+  background_bit: 3
