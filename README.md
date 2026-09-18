@@ -1,12 +1,24 @@
 # RoadSense-MTL
 
-Tài liệu tổng quan chi tiết bằng tiếng Việt: `docs/project_overview_vi.md`.
+Conflict-Aware Multi-Task Road Scene Understanding for Object Detection,
+Drivable-Area Segmentation and Lane Detection.
+
+Tài liệu:
+
+- [Documentation index](docs/README.md).
+- [Tổng quan chi tiết](docs/project_overview_vi.md).
+- [Thiết kế nghiên cứu conflict-aware](docs/conflict_aware_research_design_vi.md).
 
 RoadSense-MTL studies negative transfer in joint object detection, drivable-area
 segmentation, and lane detection. The repository currently implements the data
 foundation (Milestone 1) and reproducible independent baselines (Milestone 2).
 The multi-task model planned for Milestone 3 is intentionally not implemented
 until Milestone 2 is accepted.
+
+Current status: Milestones 1–2 are implemented and tested. The task-specific
+adapter and gradient-conflict design for Milestone 3 is documented but has not
+been implemented. All current model profiles use a 640×384 letterbox canvas
+(`width × height`; YAML uses `[384, 640]`).
 
 ## Implemented scope
 

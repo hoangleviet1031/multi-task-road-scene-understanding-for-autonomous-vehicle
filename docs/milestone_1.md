@@ -10,7 +10,8 @@ network is implemented. It answers four questions:
 3. Can the train/development split be reproduced without sequence leakage?
 4. Do metrics return known answers on controlled synthetic examples?
 
-Model definition and training belong to Milestone 2 and are deliberately absent.
+Model definition and training are implemented separately in Milestone 2 and are
+deliberately absent from the Milestone 1 data layer.
 
 ## Canonical sample contract
 
@@ -32,8 +33,9 @@ rasterizing the unified label JSON's Scalabel `poly2d` paths. Cubic Bézier
 commands are sampled before drawing; drivable regions are filled and lane paths
 are stroked as binary foreground. Raw BDD100K files are never rewritten.
 
-The object is framework-neutral. A future PyTorch adapter can convert these
-arrays to tensors without coupling data validation to the training framework.
+The object is framework-neutral. The Milestone 2 PyTorch adapter in
+`training/data.py` converts these arrays to tensors without coupling data
+validation to the training framework.
 
 ## Public functions and their input/output
 

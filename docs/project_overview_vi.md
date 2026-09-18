@@ -2,12 +2,19 @@
 
 ## 1. Thông tin chung
 
-**Tên đề tài:** Multi-Task Road Scene Understanding for Autonomous Vehicles
+**Tên đề tài:** RoadSense-MTL: Conflict-Aware Multi-Task Road Scene Understanding
+for Object Detection, Drivable-Area Segmentation and Lane Detection
 **Tên mã nguồn:** RoadSense-MTL
 **Bài toán:** Nhận thức cảnh đường đa nhiệm từ ảnh camera đơn
 **Dataset chính:** BDD100K
 **Framework:** Python, PyTorch, Torchvision
 **Trạng thái hiện tại:** Milestone 1 và Milestone 2 đã được triển khai; Milestone 3 chưa bắt đầu.
+**Input chuẩn:** letterbox canvas `640×384` (`width × height`), tương ứng
+`[384,640]` theo thứ tự `height × width` trong YAML/tensor.
+
+Thiết kế chuẩn cho phần nghiên cứu Milestone 3 được quản lý tại
+`docs/conflict_aware_research_design_vi.md`. Tài liệu tổng quan này chỉ tóm tắt
+thiết kế đó và không thay thế research specification.
 
 RoadSense-MTL nghiên cứu khả năng dùng một hệ thống học sâu để đồng thời thực
 hiện ba nhiệm vụ quan trọng trong xe tự hành:
@@ -48,8 +55,9 @@ Các nhiệm vụ có liên hệ nhưng không hoàn toàn đồng nhất:
 
 Do đó, câu hỏi nghiên cứu cốt lõi là:
 
-> Có thể chia sẻ backbone/feature pyramid giữa ba nhiệm vụ mà vẫn giữ hoặc cải
-> thiện chất lượng từng nhiệm vụ so với các model đơn nhiệm hay không?
+> Liệu task-specific adapters kết hợp cơ chế xử lý gradient xung đột có thể
+> giảm negative transfer trong multi-task road perception, đặc biệt ở điều
+> kiện đêm, mưa và dữ liệu ngoài domain hay không?
 
 ---
 
@@ -57,20 +65,24 @@ Do đó, câu hỏi nghiên cứu cốt lõi là:
 
 ### 3.1. Câu hỏi nghiên cứu
 
-- **RQ1:** Hard parameter sharing có tốt hơn ba model đơn nhiệm không?
-- **RQ2:** Nhiệm vụ nào hỗ trợ nhau và cặp nhiệm vụ nào gây xung đột gradient?
-- **RQ3:** Loss weighting động có giảm negative transfer hơn trọng số cố định không?
-- **RQ4:** Gradient surgery như PCGrad có cải thiện Pareto trade-off giữa các task không?
-- **RQ5:** Multi-task learning tiết kiệm bao nhiêu parameter, bộ nhớ và thời gian suy luận?
-- **RQ6:** Hiệu quả có ổn định trong các điều kiện ban ngày, ban đêm, mưa, tuyết,
-  đường thành phố và cao tốc không?
+- **RQ1:** Hard parameter sharing gây positive hay negative transfer so với các
+  capacity-matched single-task controls?
+- **RQ2:** Task-specific adapters có cải thiện specialization của từng head không?
+- **RQ3:** Nhiệm vụ nào hỗ trợ nhau và cặp nào tạo gradient cosine âm trên shared parameters?
+- **RQ4:** PCGrad có giảm conflict rate và cải thiện Pareto trade-off không?
+- **RQ5:** Kết hợp adapters + PCGrad có tốt hơn từng thành phần riêng lẻ không?
+- **RQ6:** Lợi ích có ổn định trong điều kiện đêm, mưa, controlled shift và real OOD không?
+- **RQ7:** Độ chính xác đạt được phải đánh đổi bao nhiêu parameter, memory và latency?
 
 ### 3.2. Giả thuyết
 
 - Drivable area và lane có khả năng hỗ trợ nhau vì cùng phụ thuộc vào hình học mặt đường.
 - Detection có thể gây xung đột với dense segmentation ở các feature map độ phân giải cao.
-- Trọng số loss cố định khó duy trì cân bằng trong toàn bộ quá trình huấn luyện.
-- PCGrad hoặc GradNorm có thể giảm xung đột, nhưng tăng chi phí huấn luyện.
+- Task-specific adapters có thể giữ shared representation nhưng cho phép từng
+  task học residual feature chuyên biệt với ít parameter bổ sung.
+- PCGrad có thể giảm gradient conflict trên shared encoder/FPN, nhưng tăng chi phí huấn luyện.
+- Adapters và PCGrad có thể bổ sung cho nhau: một thành phần xử lý specialization,
+  thành phần còn lại xử lý optimization conflict.
 - MTL có thể giảm tổng parameter và latency so với chạy ba mạng độc lập, ngay cả
   khi độ chính xác của một nhiệm vụ giảm nhẹ.
 
@@ -106,7 +118,7 @@ Các giả thuyết trên là định hướng cho Milestone 3, chưa phải k�
 |---|---|---|
 | 1 | Data foundation, audit, split, metric, visualization | Hoàn thành |
 | 2 | Ba baseline đơn nhiệm, training/evaluation/checkpoint | Hoàn thành |
-| 3 | Shared multi-task network và loss balancing | Chưa bắt đầu |
+| 3 | Capacity-matched controls, shared network, adapters và PCGrad | Chưa bắt đầu |
 | 4 | Ablation, negative-transfer analysis, robustness | Dự kiến |
 | 5 | Demo, báo cáo và đóng gói kết quả | Dự kiến |
 
@@ -333,6 +345,7 @@ vào overlap của foreground mảnh.
 ## 10. Thiết kế dự kiến cho Milestone 3
 
 Phần này mô tả hướng nghiên cứu, **chưa được implement**.
+Chi tiết có tính quy chuẩn nằm trong `docs/conflict_aware_research_design_vi.md`.
 
 ### 10.1. Shared architecture đề xuất
 
@@ -344,14 +357,17 @@ Phần này mô tả hướng nghiên cứu, **chưa được implement**.
                       Shared feature pyramid
                  ┌────────────┼──────────────┐
                  │            │              │
+         Det adapters    Drv adapters    Lane adapters
+                 │            │              │
           Detection head  Drivable head   Lane head
                  │            │              │
              boxes/classes  3-class mask  binary mask
 ```
 
-Một hướng thực tế là shared ResNet18/ResNet50 + FPN để giữ khả năng chạy trong
-giới hạn GPU sinh viên. Mỗi task dùng head riêng, còn encoder và một phần FPN
-được chia sẻ.
+Kiến trúc chính được đề xuất là shared ResNet18 + FPN để giữ khả năng chạy trong
+giới hạn GPU sinh viên. Mỗi task có residual bottleneck adapters và head riêng;
+encoder/FPN là phần chia sẻ chịu conflict-aware optimization. ResNet50 chỉ là
+mở rộng sau khi pipeline ResNet18 ổn định.
 
 ### 10.2. Baseline công bằng bắt buộc
 
@@ -377,16 +393,16 @@ Với ba task, loss tổng quát:
 L_total = w_det L_det + w_drv L_drv + w_lane L_lane
 ```
 
-Các phương pháp nên thử:
+Các phương pháp nên thử theo thứ tự:
 
 1. **Fixed weights:** đơn giản, làm control experiment.
-2. **Uncertainty weighting:** học trọng số từ task uncertainty.
-3. **Dynamic Weight Averaging:** điều chỉnh theo tốc độ giảm loss.
-4. **GradNorm:** cân bằng gradient magnitude lên shared parameters.
-5. **PCGrad:** chiếu bỏ thành phần gradient xung đột giữa task.
+2. **Adapters + fixed weights:** cô lập tác động của task specialization.
+3. **PCGrad:** chiếu bỏ thành phần gradient xung đột giữa task.
+4. **Adapters + PCGrad:** cấu hình đề xuất đầy đủ.
+5. **GradNorm/uncertainty weighting:** baseline động nếu còn compute budget.
 
-Không nên triển khai tất cả ngay lập tức. Thứ tự hợp lý là fixed weighting,
-uncertainty hoặc GradNorm, sau đó PCGrad nếu log gradient cho thấy xung đột rõ.
+Gradient surgery chỉ áp dụng cho shared encoder/FPN; adapters và heads nhận
+gradient riêng của task tương ứng.
 
 ### 10.4. Gradient-conflict logging
 
@@ -801,8 +817,11 @@ Với demo nghiên cứu, nên có thêm panel hiển thị:
 ## 22. Tài liệu liên quan trong repository
 
 - `README.md`: hướng dẫn bắt đầu nhanh.
+- `docs/README.md`: index, trạng thái và quy tắc đồng bộ tài liệu.
 - `docs/milestone_1.md`: data contract, audit, split và metric foundation.
 - `docs/milestone_2.md`: kiến trúc baseline, function contracts và lệnh chạy.
+- `docs/conflict_aware_research_design_vi.md`: research specification cho
+  task-specific adapters, PCGrad, robustness và OOD evaluation.
 - `configs/data/bdd100k.yaml`: vị trí và encoding dữ liệu.
 - `configs/experiments/*.yaml`: cấu hình huấn luyện tái lập được.
 
